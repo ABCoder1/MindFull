@@ -1,5 +1,5 @@
 # MindFull
-MindFull is a local-first web app that records meeting audio, transcribes speech using a Whisper-style model via a Groq API, and generates live, contextual suggestions and detailed answers using a chat model. It pairs a small static frontend (in `public/`) with a FastAPI backend (in `api/index.py`) that proxies requests to the Groq SDK.
+MindFull is a local-first web app that records meeting audio, transcribes speech using a Whisper-style model via a Groq API, and generates live, contextual suggestions and detailed answers using a chat model. It pairs a small static frontend (in `main.js`) with a FastAPI backend (in `api/index.py`) that proxies requests to the Groq SDK.
 
 **Key features**
 - **Live transcription**: capture audio from the browser and transcribe using a cloud model via the backend.
@@ -9,7 +9,7 @@ MindFull is a local-first web app that records meeting audio, transcribes speech
 
 **Repository layout**
 - **api/**: FastAPI backend endpoints ([api/index.py](api/index.py#L1)).
-- **public/**: static frontend files ([public/index.html](public/index.html#L1), [public/main.js](public/main.js#L1), [public/index.css](public/index.css#L1)).
+- **static frontend files/**: ([index.html](index.html#L1), [main.js](main.js#L1), [index.css](index.css#L1)).
 - **prompts.json**: prompt templates used by the frontend to drive suggestions and chat behavior.
 - **requirements.txt**: Python dependencies for the backend.
 - **package.json**: (optional) contains `http-server` for serving the frontend in development.
@@ -43,15 +43,15 @@ uvicorn api.index:app --reload --port 8000
 The backend exposes API endpoints under `/api/*` (for example `/api/transcribe`, `/api/suggest`, `/api/chat`) and expects the frontend to POST form data including an `api_key` (Groq API key) and other fields.
 
 **Setup [frontend] (development)**
-The frontend is static and lives in `public/`. You can open `public/index.html` directly in a browser (some features require a server) or serve the folder with a static server.
+The frontend is static and lives in the root of the repository (`./`). You can open `./index.html` directly in a browser (some features require a server) or serve the folder with a static server.
 
 Using `http-server` (if you have Node):
 
 ```bash
 # install globally if needed
 npm install -g http-server
-# serve the public folder on port 8080
-http-server public -p 8080
+# serve the folder on port 8080
+http-server -p 8080
 ```
 
 Open http://localhost:8080 and set your Groq API key in the Settings modal. The frontend now defaults to same-origin `/api` requests, and only uses the Backend URL Override field for local development when the API runs on a separate host.
@@ -76,17 +76,17 @@ Open http://localhost:8080 and set your Groq API key in the Settings modal. The 
 # 1) start backend
 uvicorn api.index:app --reload --port 8000
 # 2) serve frontend (from repo root)
-http-server public -p 8080
+http-server -p 8080
 # 3) open http://localhost:8080 in your browser
 ```
 
 **Development tips**
 - Edit prompts in `prompts.json` to change assistant behavior.
-- Use browser devtools to inspect network requests from `public/main.js` to the backend.
+- Use browser devtools to inspect network requests from `main.js` to the backend.
 - If streaming responses fail in some environments, the backend returns a full response fallback, check server logs for tracebacks.
 
 **Deployment**
-- The repository is now Vercel-friendly: the static frontend stays in `public/`, the FastAPI backend lives under `api/`, and `vercel.json` rewrites `/` to `/index.html`.
+- The repository is now Vercel-friendly: the static frontend stays in the repository's root `./`, the FastAPI backend lives under `api/`, and `vercel.json` rewrites `/` to `/index.html`.
 - Leave the Backend URL Override blank in production so the browser talks to the same origin at `/api/*`.
 - If you need to point the frontend at a separate backend while developing locally, set the override in the Settings modal instead of editing source code.
 

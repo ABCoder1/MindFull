@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MindFull — Meeting Transcription & Live Suggestions</title>
+  <link rel="stylesheet" href="index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <div class="topbar">
+    <img src="favicon.ico" alt="MindFull Logo" class="logo" />
+    <h1>MindFull — Meeting Transcription & Live Suggestions</h1>
+    <button id="settingsBtn" class="settings-trigger-btn" title="Open Settings">⚙️ Settings</button>
+    <div id="settingsModal" class="modal-overlay" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>System Settings</h2>
+          <button id="closeSettings" class="close-btn">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+          <section class="settings-section">
+            <h3>Authentication</h3>
+            <div class="field-group">
+              <label for="groqKeyInput">Groq API Key</label>
+              <input type="password" id="groqKeyInput" placeholder="gsk_...">
+              <p class="field-help">Key is stored locally in your browser and never sent to our servers.</p>
+            </div>
+            <br>
+            <div class="field-group">
+              <label for="backendUrlInput">Backend URL Override</label>
+              <input type="url" id="backendUrlInput" placeholder="Leave blank to use the current origin">
+              <p class="field-help">Use this only for local development; Vercel deployments should keep this blank and call the same-origin /api routes.</p>
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <h3>Live Suggestion Prompt</h3>
+            <div class="prompt-editor">
+              <div class="field-group">
+                <label for="suggestionPromptInput">Core Prompt Text</label>
+                <textarea id="suggestionPromptInput" rows="5"></textarea>
+              </div>
+              <div class="field-group">
+                <label>Locked Context Suffix Block</label>
+                <pre id="suggestionContextBlock" class="prompt-context" aria-readonly="true"></pre>
+              </div>
+            </div>
+
+            <h3>Chat Prompt Mode</h3>
+            <div class="grid-fields">
+              <div class="field-group">
+                <label for="chatPromptModeSelect">Answer Style</label>
+                <select id="chatPromptModeSelect">
+                  <option value="detailed">Detailed (default)</option>
+                  <option value="concise">Concise</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="prompt-editor">
+              <div class="field-group">
+                <label for="chatPromptInput">Core Prompt Text</label>
+                <textarea id="chatPromptInput" rows="5"></textarea>
+              </div>
+              <div class="field-group">
+                <label>Locked Context Suffix Block</label>
+                <pre id="chatContextBlock" class="prompt-context" aria-readonly="true"></pre>
+              </div>
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <h3>Context Windows (Characters)</h3>
+            <div class="grid-fields">
+              <div class="field-group">
+                <label>Suggestion Context</label>
+                <input type="number" id="contextWindowSuggestion" step="500">
+              </div>
+              <div class="field-group">
+                <label>Chat Context</label>
+                <input type="number" id="contextWindowChat" step="500">
+              </div>
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <h3>Export Options</h3>
+            <div class="grid-fields">
+              <div class="field-group">
+                <label for="autoExportSelect">Auto-Export</label>
+                <select id="autoExportSelect">
+                  <option value="disabled">Disabled (default)</option>
+                  <option value="enabled">Enabled</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label for="exportFormatSelect">Export Format</label>
+                <select id="exportFormatSelect">
+                  <option value="txt">TXT (default)</option>
+                  <option value="json">JSON</option>
+                </select>
+              </div>
+            </div>
+          </section>
+        </div>
+        
+        <div class="modal-footer">
+          <button id="saveSettings" class="save-btn">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Floating banner for non-blocking messages -->
+  <div id="floatingBanner" class="floating-banner" style="display:none"></div>
+
+  <div class="layout">
+    <!-- LEFT COLUMN: MIC + TRANSCRIPT -->
+    <div class="col">
+      <header><span>1. Mic & Transcript</span><span id="recState">idle</span></header>
+      <div class="mic-wrap">
+        <button id="micBtn" class="mic-btn" title="Start / stop recording">●</button>
+        <button class="reload-btn" id="exportTranscriptBtn" title="Download transcript as JSON or TXT (configured in settings)">Export transcript</button>
+        <div class="mic-status" id="micStatus">Click mic to start. Transcript appends every ~30s.</div>
+      </div>
+      <div class="body" id="transcriptBody">
+        <div class="help-banner">
+          The transcript scrolls and appends live speech-to-text while recording.
+          Use the mic button to start/stop. Enable auto-export to download a local .txt transcript file whenever recording stops.
+        </div>
+        <div class="empty" id="transcriptEmpty">No transcript yet — start the mic.</div>
+      </div>
+    </div>
+
+    <!-- MIDDLE COLUMN: LIVE SUGGESTIONS -->
+    <div class="col">
+      <header><span>2. Live Suggestions</span><span id="batchCount">0 batches</span></header>
+      <div class="reload-row">
+        <button class="reload-btn" id="reloadBtn">↻ Reload suggestions</button>
+        <span class="countdown" id="countdown">auto-refresh in 30s</span>
+      </div>
+      <div class="body" id="suggestionsBody">
+        <div class="help-banner">
+          On reload (or auto every ~30s), generate <b>3 fresh suggestions</b> from recent transcript context.
+          New batch appears at the top; older batches push down (faded). Each is a tappable card: a
+          <span style="color:var(--accent)">question to ask</span>,
+          a <span style="color:var(--accent-2)">talking point</span>,
+          an <span style="color:var(--good)">answer</span>, or a
+          <span style="color:var(--warn)">fact-check</span>.
+        </div>
+        <div class="empty" id="suggestionsEmpty">Suggestions appear here once recording starts.</div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: CHAT -->
+    <div class="col">
+      <header><span>3. Chat (detailed answers)</span><span>session-only</span></header>
+      <div class="body" id="chatBody">
+        <div class="help-banner">
+          Clicking a suggestion adds it to this chat and streams a detailed answer (separate prompt, more context).
+          User can also type questions directly. One continuous chat per session — no login, no persistence.
+        </div>
+        <div class="empty" id="chatEmpty">Click a suggestion or type a question below.</div>
+      </div>
+      <div class="chat-input-row">
+        <input id="chatInput" placeholder="Ask anything…" />
+        <button id="chatSend">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

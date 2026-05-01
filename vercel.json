@@ -1,9 +1,20 @@
 {
-  "version": 2,
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "api/index.py"
+  "routes": [
+    { 
+        "src": "/api/(.*)", 
+        "dest": "/api/index.py" 
+    },
+    { 
+        "src": "/$", 
+        "dest": "/index.html" 
+    },
+    { 
+        "src": "/(.*\\.(css|js|png|jpg|svg|ico|json))", 
+        "dest": "/$1" 
+    },
+    { 
+        "src": "/(.*)", 
+        "dest": "/index.html" 
     }
   ]
 }

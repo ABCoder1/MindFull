@@ -9,7 +9,7 @@ MindFull is a local-first web app that records meeting audio, transcribes speech
 
 **Repository layout**
 - **api/**: FastAPI backend endpoints ([api/index.py](api/index.py#L1)).
-- **static frontend files/**: ([index.html](index.html#L1), [main.js](main.js#L1), [index.css](index.css#L1)).
+- **static frontend files/**: ([index.html](public/index.html#L1), [main.js](public/main.js#L1), [index.css](public/index.css#L1)).
 - **prompts.json**: prompt templates used by the frontend to drive suggestions and chat behavior.
 - **requirements.txt**: Python dependencies for the backend.
 - **package.json**: (optional) contains `http-server` for serving the frontend in development.

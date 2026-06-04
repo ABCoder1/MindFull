@@ -1,4 +1,7 @@
 # MindFull
+
+![MindFull-Demo](./mindfull-demo.gif)
+
 MindFull is a local-first web app that records meeting audio, transcribes speech using a Whisper-style model via a Groq API, and generates live, contextual suggestions and detailed answers using a chat model. It pairs a small static frontend (in `main.js`) with a FastAPI backend (in `api/index.py`) that proxies requests to the Groq SDK.
 
 **Key features**

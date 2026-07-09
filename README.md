@@ -1,5 +1,5 @@
 <p align="center">
-  <h2 align="center"> MindFull  </h2>
+  <h1 align="center"> MindFull  </h1>
   
   <p align="center">
     <img alt="Groq" src="https://img.shields.io/badge/Inference-Groq_LPU-f55142?style=flat" /> <img alt="Vercel Deployment" src="https://img.shields.io/badge/deployed_on-Vercel-black?logo=vercel" /> <a href="https://github.com/ABCoder1/MindFull/deployments"><img alt="Build status" src="https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge?style=flat-square&branch=main" /></a>

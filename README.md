@@ -1,6 +1,16 @@
-# MindFull
+<p align="center">
+  <h2 align="center"> MindFull  </h2>
+  
+  <p align="center">
+    <img alt="Groq" src="https://img.shields.io/badge/Inference-Groq_LPU-f55142?style=flat" /> <img alt="Vercel Deployment" src="https://img.shields.io/badge/deployed_on-Vercel-black?logo=vercel" /> <a href="https://github.com/ABCoder1/MindFull/deployments"><img alt="Build status" src="https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge?style=flat-square&branch=main" /></a>
+  </p>
+</p>
 
-![MindFull-Demo](./mindfull-demo.gif)
+<p align="center">
+  <img src="./mindfull-demo.gif" alt="MindFul-Demo" />
+</p>
+
+<p align="center"> Deployed app can be accessed at : https://mindfull-ai.vercel.app </p>
 
 MindFull is a local-first web app that records meeting audio, transcribes speech using a Whisper-style model via a Groq API, and generates live, contextual suggestions and detailed answers using a chat model. It pairs a small static frontend (in `main.js`) with a FastAPI backend (in `api/index.py`) that proxies requests to the Groq SDK.
 
